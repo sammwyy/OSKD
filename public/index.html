@@ -5,75 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="/socket-io.js"></script>
-    <title></title>
   </head>
   <body>
     <div class="wrapper">
       <div class="keys" id="keys"></div>
     </div>
 
-    <script>
-      const MAPPING = {
-        LeftControl: "CTRL",
-        RightControl: "CTRL",
-        Escape: "ESC",
-        LeftShift: "Shift",
-        RightShift: "Shift",
-        Comma: ",",
-        Period: ".",
-        Up: "▲",
-        Down: "▼",
-        Left: "◀",
-        Right: "▶",
-        Enter: "↩",
-        BackSpace: "←",
-        LeftAlt: "ALT",
-        RightAlt: "ALT",
-        LeftWindows: "⊞",
-        Rightwindows: "⊞",
-        BackwardSlash: "\\",
-      };
-
-      function fixInput(input) {
-        const mapped = MAPPING[input];
-        if (mapped) {
-          return mapped;
-        } else if (input.startsWith("Number")) {
-          return input.split("Number")[1];
-        } else {
-          return input;
-        }
-      }
-    </script>
-
-    <script>
-      const socket = io();
-      const container = document.getElementById("keys");
-      const keys = [];
-
-      function addKey(key) {
-        const keyElement = document.createElement("div");
-        keyElement.classList.add("key");
-        keyElement.innerText = key;
-        keys.push(keyElement);
-        container.appendChild(keyElement);
-
-        if (keys.length > 20) {
-          keys.shift().remove();
-        }
-      }
-
-      socket.on("connect", () => {
-        console.log("Connected socket to backend.");
-      });
-
-      socket.on("keydown", (key) => {
-        const input = fixInput(key);
-        console.log("Received keydown: " + input);
-        addKey(input);
-      });
-    </script>
-
+    <script src="/app.js"></script>
     <style>
       body {
         padding: 0;

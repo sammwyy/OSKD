@@ -6,7 +6,7 @@ OSKD is an on-screen keyboard display that can be used during streams. It provid
 
 - [x] Create a prototype of the application.
 - [x] Make it compatible with multiple platforms.
-- [ ] Implement a Shift/CTRL mapper to support key combinations.
+- [x] Implement a Shift/CTRL mapper to support key combinations.
 - [ ] Make it configurable and customizable.
 - [ ] Allow customization of key icons.
 - [ ] Implement Keystrokes mode to display all keystrokes on the screen.

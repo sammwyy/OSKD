@@ -1,5 +1,6 @@
 use axum::{body::Body, routing::get, Server};
 use http::Response;
+use rdev::{listen, Event};
 use socketio_server::{
     config::SocketIoConfig, layer::SocketIoLayer, ns::Namespace, socket::Socket,
 };
@@ -7,8 +8,6 @@ use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
-
-use mki::Action;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -35,21 +34,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build();
 
     // Listen keyboard.
-    mki::bind_any_key(Action::handle_kb(move |key| {
-        let key = key.to_string();
-        let key: Vec<&str> = key.split("(").collect();
-        let key_str = key.first().unwrap();
-
+    let callback = move |event: Event| {
+        let json = serde_json::to_string(&event).unwrap();
         let clients_lock = clients.lock().unwrap();
-        let mut i = 0;
 
         for socket in clients_lock.iter() {
-            socket.emit("keydown", key_str).unwrap();
-            i += 1;
+            socket.emit("input", json.clone()).unwrap();
         }
-
-        println!("Sent input {} to {} connected clients.", key_str, i);
-    }));
+    };
 
     // Create HTTP service.
     let app = axum::Router::new()
@@ -61,6 +53,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }),
         )
         .route(
+            "/app.js",
+            get(move || async {
+                let js = include_str!("../public/app.js");
+                js
+            }),
+        )
+        .route(
             "/socket-io.js",
             get(move || async {
                 let js = include_str!("../public/socket-io.js");
@@ -69,12 +68,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .layer(SocketIoLayer::from_config(config, ns_handler));
 
-    let addr = "127.0.0.1:41770";
-    println!("Listening widget on http://{}/", addr);
-    Server::bind(&addr.parse().unwrap())
-        .serve(app.into_make_service())
-        .await?;
+    tokio::task::spawn(async move {
+        let addr = "127.0.0.1:41770";
+        println!("Listening widget on http://{}/", addr);
 
-    println!("Shutting down application.");
+        Server::bind(&addr.parse().unwrap())
+            .serve(app.into_make_service())
+            .await
+            .unwrap();
+    });
+
+    println!("Listening for keyboard input");
+    if let Err(error) = listen(callback) {
+        println!("Error listening for Keyboard input: {:?}", error)
+    };
+
     Ok(())
 }
