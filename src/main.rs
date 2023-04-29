@@ -5,6 +5,7 @@ use socketio_server::{
     config::SocketIoConfig, layer::SocketIoLayer, ns::Namespace, socket::Socket,
 };
 use std::{
+    env, fs,
     sync::{Arc, Mutex},
     time::Duration,
 };
@@ -64,6 +65,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             get(move || async {
                 let js = include_str!("../public/socket-io.js");
                 js
+            }),
+        )
+        .route(
+            "/config.json",
+            get(move || async {
+                // Load configuration.
+                let config_file = env::current_dir().unwrap().join("config.json");
+
+                if config_file.exists() {
+                    return fs::read_to_string(config_file).unwrap();
+                } else {
+                    let config = include_str!("../public/default_config.json").to_string();
+                    fs::write(config_file, config.clone()).unwrap();
+                    return config;
+                }
             }),
         )
         .layer(SocketIoLayer::from_config(config, ns_handler));

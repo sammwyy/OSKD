@@ -1,40 +1,32 @@
-// Mapping and utils.
-const MAPPING = {
-  ControlLeft: "Ctrl",
-  ControlRight: "Ctrl",
-  Escape: "Esc",
-  ShiftLeft: "Shift",
-  ShiftRight: "Shift",
-  UpArrow: "▲",
-  DownArrow: "▼",
-  LeftArrow: "◀",
-  RightArrow: "▶",
-  Return: "↩",
-  Backspace: "←",
-  Alt: "Alt",
-  AltGr: "Alt",
-  MetaLeft: "⊞",
-  MetaRight: "⊞",
-  Space: "―",
-  CapsLock: "Caps",
+// HTML References.
+const container = document.getElementById("keys");
+
+// Config provider.
+let config = {
+  options: {
+    doNotRepeatLastKey: false,
+    printOnlyCombinations: false,
+    rowLayout: "",
+  },
+  modifiersKeys: [],
+  keyMapping: {},
 };
 
-const SPECIALS = [
-  "ControlLeft",
-  "ControlRight",
-  "ShiftLeft",
-  "ShiftRight",
-  "Alt",
-  "AltGr",
-  "MetaLeft",
-  "MetaRight",
-];
+function setConfig(newConfig) {
+  config = newConfig;
+  container.classList.add(config.options.rowLayout);
+}
 
+fetch("/config.json")
+  .then((res) => res.json())
+  .then(setConfig);
+
+// Mapping and utils.
 const COMMONS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890".split("");
 
 function fixKey({ name, code }) {
-  const mapped = MAPPING[code];
+  const mapped = config.keyMapping[code];
   if (mapped) {
     return mapped;
   } else if (name) {
@@ -50,12 +42,11 @@ function isCommon(key) {
   return COMMONS.includes(fixKey(key));
 }
 
-function isSpecial(code) {
-  return SPECIALS.includes(code);
+function isModifierKey(code) {
+  return config.modifiersKeys.includes(code);
 }
 
 // UI Handler.
-const container = document.getElementById("keys");
 const combination = {
   keys: [],
   element: null,
@@ -93,16 +84,19 @@ function onKeyPress(name, code) {
 
   if (combination.element) {
     const last = combination.keys[combination.keys.length - 1];
-    if (last?.code != code) {
-      combination.keys.push(key);
-      combination.update();
+
+    if (config.options.doNotRepeatLastKey && last?.code == code) {
+      return;
     }
+
+    combination.keys.push(key);
+    combination.update();
   } else {
-    if (isSpecial(code)) {
+    if (isModifierKey(code)) {
       addCombination();
       combination.keys.push(key);
       combination.update();
-    } else {
+    } else if (config.options.printOnlyCombinations) {
       addKey(fixKey(key));
     }
   }
