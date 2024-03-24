@@ -56,6 +56,19 @@ const keys = [];
 
 function addKey(key) {
   const keyElement = document.createElement("div");
+
+  keyElement.opacity = 1;
+  (function fade(){
+    if ((keyElement.opacity -= 0.025) < 0) {
+      // NOTE: lowering `keyElement.opacity`, doesnt make the element partially doesnt make it more transparent
+      // So we rely on removing this after it reaches zero. TODO: fix this
+      keyElement.display="none"
+      keyElement.remove();
+    } else {
+      setTimeout(fade,50)
+    }
+  })();
+
   keyElement.classList.add("key");
   keyElement.innerText = key;
   keys.push(keyElement);
