@@ -60,7 +60,7 @@ function addKey(key) {
   keyElement.opacity = 1;
   (function fade(){
     if ((keyElement.opacity -= 0.025) < 0) {
-      // NOTE: lowering `keyElement.opacity`, doesnt make the element partially doesnt make it more transparent
+      // NOTE: lowering `keyElement.opacity` doesnt make the element partially transparent.
       // So we rely on removing this after it reaches zero. TODO: fix this
       keyElement.display="none"
       keyElement.remove();
