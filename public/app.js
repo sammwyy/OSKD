@@ -75,6 +75,7 @@ function applyConfigStyling(element) {
   applyStyleConfig(element, "textColor", "color");
   applyStyleConfig(element, "backgroundColor");
   applyStyleConfig(element, "borderRadius");
+  applyStyleConfig(element, "padding");
 }
 
 function applyStyleConfig(element, configKey, styleName = configKey) {
