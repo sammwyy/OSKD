@@ -10,6 +10,7 @@ let config = {
   },
   modifiersKeys: [],
   keyMapping: {},
+  keyStyle: {},
 };
 
 function setConfig(newConfig) {
@@ -57,6 +58,7 @@ const keys = [];
 function addKey(key) {
   const keyElement = document.createElement("div");
   keyElement.classList.add("key");
+  applyConfigStyling(keyElement);
   keyElement.innerText = key;
   keys.push(keyElement);
   container.appendChild(keyElement);
@@ -66,6 +68,21 @@ function addKey(key) {
   }
 
   return keyElement;
+}
+
+function applyConfigStyling(element) {
+  applyStyleConfig(element, "fontSize");
+  applyStyleConfig(element, "textColor", "color");
+  applyStyleConfig(element, "backgroundColor");
+  applyStyleConfig(element, "borderRadius");
+  applyStyleConfig(element, "padding");
+}
+
+function applyStyleConfig(element, configKey, styleName = configKey) {
+  const cfg = config["keyStyle"][configKey];
+  if (cfg) {
+    element.style[styleName] = cfg;
+  }
 }
 
 function addCombination() {

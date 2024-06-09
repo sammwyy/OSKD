@@ -30,5 +30,12 @@
     "MetaRight": "⊞",
     "Space": "―",
     "CapsLock": "Caps"
+  },
+  "keyStyle": {
+    "fontSize": "1rem",
+    "textColor": "#fffa",
+    "backgroundColor": "#000c",
+    "borderRadius": "7px",
+    "padding": "10px"
   }
 }
